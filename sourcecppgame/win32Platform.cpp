@@ -57,7 +57,52 @@ LRESULT CALLBACK windowCallback(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	const auto pClassName = L"source window";//pointer Class name
+	SDL_Init(SDL_INIT_VIDEO);
+	
+	SDL_Window* sdlWindow = SDL_CreateWindow("SDL test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, 0);
+	SDL_Renderer* sdlRender = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_ACCELERATED);
+	
+	SDL_Event sdlEvent;
+	SDL_Rect* r = new SDL_Rect;
+	
+	r->x = 612;
+	r->y = 315;
+	r->w = 20;
+	r->h = 20;
+
+	while (running)
+	{
+
+		while (SDL_PollEvent(&sdlEvent))
+		{
+			switch (sdlEvent.type)
+			{
+				case SDL_QUIT:
+					running = false;
+					break;
+
+				case SDL_KEYDOWN:
+					if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_ESCAPE) { running = false; break; }
+
+				default: break;
+			}
+		}
+
+		SDL_SetRenderDrawColor(sdlRender, 0, 0, 0, 255);
+		SDL_RenderClear(sdlRender);
+		
+		SDL_SetRenderDrawColor(sdlRender, 0, 255, 0, 255);
+		SDL_RenderFillRect(sdlRender, r);
+
+		SDL_RenderPresent(sdlRender);
+	}
+
+	SDL_Quit();
+	return 0x420;
+}
+
+
+/*const auto pClassName = L"source window";//pointer Class name
 	//Create window class
 	WNDCLASS wc = {};
 	wc.style = CS_OWNDC;
@@ -88,21 +133,11 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		//Input
 		MSG message;
-		BOOL mResult;
-		while ( (mResult = PeekMessage(&message, window, 0, 0, PM_REMOVE)))
+		while (PeekMessage(&message, window, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&message);
 			DispatchMessage(&message);
 		}
-
-		switch (mResult)
-		{
-			case -1:
-			{
-				return -1;
-			}break;
-		}
-
 		
 
 		//Simulate
@@ -111,5 +146,4 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		//Render
 		StretchDIBits(hdc, 0, 0, renderState.width, renderState.height, 0, 0, renderState.width, renderState.height, renderState.memory, &renderState.bitmapInfo, DIB_RGB_COLORS, SRCCOPY);
-	}
-}
+	}*/
