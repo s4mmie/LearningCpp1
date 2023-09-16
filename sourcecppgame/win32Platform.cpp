@@ -1,5 +1,3 @@
-#include <windows.h>
-#include <SDL.h>
 #include "GameEngine.h"
 #include "GameTimer.h"
 
@@ -13,7 +11,7 @@ void Game::Start()
 	r.sdlWindow = SDL_CreateWindow("SDL test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, 0);
 	r.sdlRender = SDL_CreateRenderer(r.sdlWindow, -1, SDL_RENDERER_ACCELERATED);
 
-	SDL_Init(SDL_INIT_VIDEO);
+	SDL_Init(SDL_INIT_EVERYTHING);
 
 	SDL_SetRenderDrawColor(r.sdlRender, 0, 0, 0, 255);
 
@@ -69,9 +67,10 @@ void Renderer::Render()
 	SDL_RenderPresent(sdlRender);
 }
 
-int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpszCmdLine, int cmdShow)
 {
 	g.Start();
+	return 1;
 }
 
 /*
