@@ -1,9 +1,81 @@
 #include <windows.h>
 #include <SDL.h>
+#include "GameEngine.h"
+#include "GameTimer.h"
 
-bool running = true;
+Renderer r;
+GameLoop loop;
+Game g;
 
-struct RENDERSTATE
+void Game::Start()
+{
+	running = true;
+	r.sdlWindow = SDL_CreateWindow("SDL test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, 0);
+	r.sdlRender = SDL_CreateRenderer(r.sdlWindow, -1, SDL_RENDERER_ACCELERATED);
+
+	SDL_Init(SDL_INIT_VIDEO);
+
+	SDL_SetRenderDrawColor(r.sdlRender, 0, 0, 0, 255);
+
+	loop.Update();
+}
+
+void Game::Stop()
+{
+
+	
+	SDL_DestroyWindow(r.sdlWindow);
+	SDL_DestroyRenderer(r.sdlRender);
+	r.sdlWindow = nullptr;
+	r.sdlRender = nullptr;
+
+	SDL_Quit();
+	running = false;
+}
+
+void Game::HandleEvents()
+{
+	SDL_Event sdlEvent;
+	SDL_PollEvent(&sdlEvent);
+
+	switch (sdlEvent.type)
+	{
+	case SDL_QUIT:
+		Stop();
+		break;
+
+	case SDL_KEYDOWN:
+		if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_ESCAPE) { running = false; break; }
+
+	default: break;
+	}
+}
+
+void GameLoop::Update()
+{
+	while (g.running)
+	{
+		g.HandleEvents();
+		r.Render();
+	}
+}
+
+void Renderer::Render()
+{
+	SDL_RenderClear(sdlRender);
+
+	SDL_SetRenderDrawColor(sdlRender, 0, 255, 0, 255);
+
+	SDL_RenderPresent(sdlRender);
+}
+
+int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+{
+	g.Start();
+}
+
+/*
+* struct RENDERSTATE
 {
 	int height, width, size;
 	void* memory;
@@ -12,97 +84,25 @@ struct RENDERSTATE
 };
 
 RENDERSTATE renderState;
-
-#include "renderer.cpp"
-
+* 
 LRESULT CALLBACK windowCallback(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	LRESULT result = 0;
+
 	switch (uMsg)
 	{
 		case WM_CLOSE:
 			PostQuitMessage(69);
+			running = false; break;
 		case WM_DESTROY:
-		{
-			running = false;
-		}break;
-		case WM_SIZE:
-		{
-			RECT rect;
-			GetClientRect(hwnd, &rect); //Get windows screen cords
-			renderState.width = rect.right - rect.left; //width to renderState.
-			renderState.height = rect.bottom - rect.top; //height to renderState.
+			g.Stop(); break;
 
-			renderState.size = renderState.width * renderState.height * sizeof(unsigned int); //renderState.  Size will be the width * height * the size of an unsigned int
+		default: 
+			DefWindowProc(hwnd, uMsg, wParam, lParam); break;
 
-			if (renderState.memory) VirtualFree(renderState.memory, 0, MEM_RELEASE); //If the renderState.memory has information clear it
-			renderState.memory = VirtualAlloc(0, renderState.size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE); //Store renderState.Size into renderState. memory
-			//Bitmaps are like a grid that will store information per pixel
-			//Defining the bitmap structure bitmapInfoHeader bmiHeader
-			renderState.bitmapInfo.bmiHeader.biSize = sizeof(renderState.bitmapInfo.bmiHeader);
-			renderState.bitmapInfo.bmiHeader.biWidth = renderState.width;
-			renderState.bitmapInfo.bmiHeader.biHeight = renderState.height;
-			renderState.bitmapInfo.bmiHeader.biPlanes = 1;
-			renderState.bitmapInfo.bmiHeader.biBitCount = 32; //32 bit unsigned int
-			renderState.bitmapInfo.bmiHeader.biCompression = BI_RGB;
-
-		}break;
-		default:
-		{
-			result = DefWindowProc(hwnd, uMsg, wParam, lParam);
-		}
 	}
-	return result;
 }
 
-int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
-{
-	SDL_Init(SDL_INIT_VIDEO);
-	
-	SDL_Window* sdlWindow = SDL_CreateWindow("SDL test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, 0);
-	SDL_Renderer* sdlRender = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_ACCELERATED);
-	
-	SDL_Event sdlEvent;
-	SDL_Rect* r = new SDL_Rect;
-	
-	r->x = 612;
-	r->y = 315;
-	r->w = 20;
-	r->h = 20;
-
-	while (running)
-	{
-
-		while (SDL_PollEvent(&sdlEvent))
-		{
-			switch (sdlEvent.type)
-			{
-				case SDL_QUIT:
-					running = false;
-					break;
-
-				case SDL_KEYDOWN:
-					if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_ESCAPE) { running = false; break; }
-
-				default: break;
-			}
-		}
-
-		SDL_SetRenderDrawColor(sdlRender, 0, 0, 0, 255);
-		SDL_RenderClear(sdlRender);
-		
-		SDL_SetRenderDrawColor(sdlRender, 0, 255, 0, 255);
-		SDL_RenderFillRect(sdlRender, r);
-
-		SDL_RenderPresent(sdlRender);
-	}
-
-	SDL_Quit();
-	return 0x420;
-}
-
-
-/*const auto pClassName = L"source window";//pointer Class name
+const auto pClassName = L"source window";//pointer Class name
 	//Create window class
 	WNDCLASS wc = {};
 	wc.style = CS_OWNDC;

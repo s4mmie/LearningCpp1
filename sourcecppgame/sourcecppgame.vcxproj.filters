@@ -18,8 +18,16 @@
     <ClCompile Include="win32Platform.cpp">
       <Filter>Private</Filter>
     </ClCompile>
-    <ClCompile Include="renderer.cpp">
-      <Filter>Private</Filter>
+    <ClCompile Include="renderer.h">
+      <Filter>Public</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GameEngine.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="GameTimer.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
