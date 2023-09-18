@@ -15,11 +15,14 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="win32Platform.cpp">
+    <ClCompile Include="GameEngine.cpp">
       <Filter>Private</Filter>
     </ClCompile>
     <ClCompile Include="renderer.h">
       <Filter>Public</Filter>
+    </ClCompile>
+    <ClCompile Include="GameText.cpp">
+      <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

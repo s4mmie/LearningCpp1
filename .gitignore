@@ -1,0 +1,17 @@
+\.vs\*
+\.vs\sourcecppgame\v17\ipch
+.vs\sourcecppgame\v17\ipch\AutoPCH
+.vs
+.ipch
+.vsidx
+.tlog
+\.vs\sourcecppgame\v17\ipch\AutoPCH\4cd4f14740e49c73\WIN32PLATFORM.ipch
+*.ipch
+*.ipch
+.vs/sourcecppgame/v17/ipch/AutoPCH/ea4ec71fecd82beb/GAMEENGINE.ipch
+.vs/sourcecppgame/v17/ipch/AutoPCH/4cd4f14740e49c73/WIN32PLATFORM.ipch
+.vs/sourcecppgame/v17/ipch/AutoPCH/843c6573d1c7b4fe/GAMEENGINE.ipch
+.vs/sourcecppgame/v17/ipch/AutoPCH/cfb209cfdef7c93d/WIN32PLATFORM.ipch
+*.tlog
+*.tlog
+sourcecppgame/x64/Debug/sourcecppgame.tlog/unsuccessfulbuild

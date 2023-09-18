@@ -71,18 +71,18 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\terro\OneDrive\Documents\GitHub\source\sourcecppgame\sourcecppgame\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\Users\terro\OneDrive\Documents\GitHub\source\sourcecppgame\sourcecppgame\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\terro\OneDrive\Documents\GitHub\source\sourcecppgame\sourcecppgame\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\terro\OneDrive\Documents\GitHub\source\sourcecppgame\sourcecppgame\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Users\terro\OneDrive\Documents\GitHub\source\sourcecppgame\sourcecppgame\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\terro\OneDrive\Documents\GitHub\source\sourcecppgame\sourcecppgame\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -98,8 +98,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\terro\OneDrive\Documents\GitHub\source\sourcecppgame\sourcecppgame\lib\x86;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_ttf.lib;SDL2test.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)\lib\x86;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -119,8 +119,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\terro\OneDrive\Documents\GitHub\source\sourcecppgame\sourcecppgame\lib\x86;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_ttf.lib;SDL2test.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)\lib\x86;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -137,8 +137,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\terro\OneDrive\Documents\GitHub\source\sourcecppgame\sourcecppgame\lib\x64;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib\x64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_ttf.lib;SDL2test.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)\lib\x64;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib\x64</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -158,18 +158,19 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\terro\OneDrive\Documents\GitHub\source\sourcecppgame\sourcecppgame\lib\x64;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib\x64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_ttf.lib;SDL2test.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)\lib\x64;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib\x64</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GameText.cpp" />
     <ClCompile Include="renderer.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="win32Platform.cpp" />
+    <ClCompile Include="GameEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameEngine.h" />

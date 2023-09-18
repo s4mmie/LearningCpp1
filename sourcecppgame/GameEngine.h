@@ -1,11 +1,19 @@
 #pragma once
 #include <windows.h>
-#include <SDL.h>
+#include <vector>
+#include <string>
+#include <iostream>
 
+#include <SDL.h>
+#include <SDL_ttf.h>
+
+
+#define SCREEN_WIDTH 1280
+#define SCREEN_HEIGHT 720
 
 class Renderer
 {
-    public:
+public:
         SDL_Window* sdlWindow;
         SDL_Renderer* sdlRender;
         void Render();
@@ -45,4 +53,17 @@ public:
             render.Render();
         }
     }
+};
+
+class Text
+{
+public:
+
+    SDL_Texture* Init(SDL_Renderer *renderer, const std::string &fontPath, int fontSize, std::string &textMessage, const SDL_Color &color, int x, int y, SDL_Rect* rect);
+
+    void display(int x, int y, SDL_Renderer *renderer, SDL_Texture* textTexture, SDL_Rect* rect);
+
+    SDL_Texture* loadFont(SDL_Renderer *renderer, const std::string &fontPath, int fontSize, const std::string &textMessage, const SDL_Color &color, int rectX, SDL_Rect* rect);
+   
+    SDL_Texture* textTexture = nullptr; 
 };

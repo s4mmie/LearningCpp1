@@ -1,0 +1,23 @@
+Make Border so you cant drag thigns out of them.
+
+Make it so you can change map length with slider
+
+Make it so if you hold tab only then does the map show up
+
+Due 9/19
+
+
+IDEAS
+
+Add map generation
+
+Make a map maker
+
+Change map into a game like doom render 3d
+
+Add shaders
+
+Add different objects
+
+Import blender models
+

@@ -1,4 +1,2 @@
-﻿  win32Platform.cpp
-SDL2main.lib(SDL_windows_main.obj) : error LNK2005: main already defined in win32Platform.obj
-SDL2main.lib(SDL_windows_main.obj) : error LNK2019: unresolved external symbol SDL_main referenced in function main_getcmdline
-C:\Users\terro\OneDrive\Documents\GitHub\source\sourcecppgame\x64\Debug\sourcecppgame.exe : fatal error LNK1120: 1 unresolved externals
+﻿  GameEngine.cpp
+  sourcecppgame.vcxproj -> C:\Users\terro\OneDrive\Documents\GitHub\source\sourcecppgame\x64\Debug\sourcecppgame.exe
