@@ -25,19 +25,19 @@ As this project evolves, I plan to implement a wide range of features within the
 
 - **Rendering Engine**: Implementing a rendering engine capable of handling 2D and 3D graphics with support for modern graphics APIs like OpenGL, Vulkan, or DirectX.
 
-- **Physics Engine**: Developing a physics engine for simulating realistic interactions between game objects, including collision detection and response.
+- **Physics Engine NOT STARTED**: Developing a physics engine for simulating realistic interactions between game objects, including collision detection and response.
 
-- **Audio System**: Incorporating an audio system for playing sounds and music in the games created with the engine.
+- **Audio System NOT STARTED**: Incorporating an audio system for playing sounds and music in the games created with the engine.
 
-- **Asset Management**: Creating tools and systems for efficient loading, management, and rendering of game assets such as textures, models, and shaders.
+- **Asset Management NOT STARTED**: Creating tools and systems for efficient loading, management, and rendering of game assets such as textures, models, and shaders.
 
 - **Scripting**: Adding scripting support to allow game logic to be defined using scripting languages like Lua or Python.
 
-- **Editor**: Building a user-friendly editor for designing levels, scenes, and game objects within the engine.
+- **Editor NOT STARTED**: Building a user-friendly editor for designing levels, scenes, and game objects within the engine.
 
-- **Cross-Platform Support**: Ensuring that the engine is cross-platform and can run on various operating systems, including Windows, macOS, and Linux.
+- **Cross-Platform Support NOT STARTED**: Ensuring that the engine is cross-platform and can run on various operating systems, including Windows, macOS, and Linux.
 
-- **Documentation**: Providing extensive documentation to make it easy for others to understand and use the engine.
+- **Documentation NOT STARTED**: Providing extensive documentation to make it easy for others to understand and use the engine.
 
 - **Examples and Tutorials**: Creating example projects and tutorials to help developers get started with the engine.
 
@@ -55,7 +55,7 @@ Here are the steps to build and run the project:
 
 1. Clone this repository to your local machine:
 
-git clone https://github.com/s4mmie/sourcecppgame
+  Need to add correct link
 
 2. Build the project using your preferred development environment and compiler.
 
@@ -71,11 +71,11 @@ The engine's architecture is structured in a modular and extensible manner. Key 
 
 - **Graphics**: This module is responsible for rendering 2D and 3D graphics. It interfaces with the underlying graphics API (e.g., OpenGL) to display visuals on the screen.
 
-- **Physics**: The physics module handles collision detection and response, as well as simulating the physical behavior of objects within the game world.
+- **Physics NOT STARTED**: The physics module handles collision detection and response, as well as simulating the physical behavior of objects within the game world.
 
-- **Audio**: This module manages audio playback, including sounds and music, to provide a rich auditory experience in games.
+- **Audio NOT STARTED**: This module manages audio playback, including sounds and music, to provide a rich auditory experience in games.
 
-- **Scripting**: The scripting module allows game logic to be scripted using a scripting language like Lua, providing flexibility in defining game behaviors.
+- **Scripting NOT STARTED**: The scripting module allows game logic to be scripted using a scripting language like Lua, providing flexibility in defining game behaviors.
 
 
 ## Contributing
