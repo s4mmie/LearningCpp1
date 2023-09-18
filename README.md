@@ -1,6 +1,6 @@
 # Game Engine Development Project
 
-![Game Engine Logo](img\Untitled.jpg)
+![Game Engine Logo](/img/Untitled.jpg)
 
 ## Overview
 
