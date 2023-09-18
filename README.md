@@ -4,7 +4,7 @@
 
 ## Overview
 
-This GitHub repository documents my journey in creating my own game engine from scratch using a combination of online resources and my own coding knowledge in C++. The goal of this project is to develop a versatile and efficient game engine that can be used to create a wide range of 2D and 3D games.
+This GitHub repository documents my journey in creating my own game engine from scratch using a combination of online resources and my own coding knowledge in C++. The goal of this project is to develop a versatile and efficient game engine that can be used to create a wide range of 2D and 3D games. 
 
 ## Table of Contents
 
@@ -86,6 +86,8 @@ Contributions to this project are welcome! Whether it's bug fixes, new features,
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+
+chat GPT wrote this read me :P
 ---
 
 Thank you for your interest in my game engine development project! If you have any questions, suggestions, or feedback, feel free to open an issue or reach out to me. Happy coding!
