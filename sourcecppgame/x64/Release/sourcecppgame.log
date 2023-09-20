@@ -1,7 +1,4 @@
-﻿  win32Platform.cpp
-  Generating code
-  0 of 120 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
-  Finished generating code
-  sourcecppgame.vcxproj -> C:\Users\terro\OneDrive\Documents\GitHub\source\sourcecppgame\x64\Release\sourcecppgame.exe
+﻿  GameText.cpp
+  GameEngine.cpp
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets(1134,5): error MSB6006: "link.exe" exited with code 1181.
+LINK : fatal error LNK1181: cannot open input file 'C:\Users\sam\Desktop\Github\paradise\sourcecppgame\\include\x64\SDL2.lib'
