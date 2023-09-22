@@ -65,5 +65,6 @@ public:
 
     SDL_Texture* loadFont(SDL_Renderer *renderer, const std::string &fontPath, int fontSize, const std::string &textMessage, const SDL_Color &color, int rectX, SDL_Rect* rect);
    
-    SDL_Texture* textTexture = nullptr; 
+    SDL_Texture* mapTexture = nullptr;
+    SDL_Texture* fpsTexture = nullptr;
 };

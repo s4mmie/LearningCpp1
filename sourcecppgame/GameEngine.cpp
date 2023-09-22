@@ -3,24 +3,32 @@
 #include "GameTimer.h"
 
 
-UINT8 red=0,green=255,blue=0;
+UINT8 red = 0, green = 255, blue = 0, alpha = 255;
+UINT32 startTime, frameTime;
 Renderer r;
 GameLoop loop;
 Game g;
 Text t;
-int mapHeight = 4;
-int mapWidth = 4;
+int mapHeight = 16;
+int mapWidth = 16;
+float fps;
 std::vector<std::vector<char>> map(mapHeight, std::vector<char>(mapWidth, '#'));
 std::string mapText = "";
+std::string fpsText = "0.0";
 SDL_Point mousePos;
 bool leftMouseButtonDown = false;
 SDL_Rect* selectedRect = NULL;
 SDL_Point clickOffset;
-SDL_Rect textBox = { 0, 0, 0, 0 };
 std::vector<SDL_Rect*> rectangles;
-
+SDL_Color col;
 SDL_Rect rect1 = { 288, 208, 100, 100 };
 SDL_Rect rect2 = { 50, 50, 100, 80 };
+SDL_Rect textBox = { 0, 0, 0, 0 };
+SDL_Rect fpsBox = { 500, 100, 0, 0 };
+
+unsigned int a = SDL_GetTicks();
+unsigned int b = SDL_GetTicks();
+double delta = 0;
 
 void Game::Start()
 {
@@ -34,6 +42,7 @@ void Game::Start()
 	rectangles.push_back(&textBox);
 	rectangles.push_back(&rect1);
 	rectangles.push_back(&rect2);
+	rectangles.push_back(&fpsBox);
 	loop.Update();
 }
 
@@ -73,12 +82,6 @@ void Game::HandleEvents()
 			{
 				if (SDL_PointInRect(&mousePos, rect))
 				{
-					if (rect == &textBox)
-					{
-						blue = 255;
-						green = 0;
-					}
-
 					selectedRect = rect;
 					clickOffset.x = mousePos.x - rect->x;
 					clickOffset.y = mousePos.y - rect->y;
@@ -93,8 +96,6 @@ void Game::HandleEvents()
 		{
 			leftMouseButtonDown = false;
 			selectedRect = NULL;
-			blue = 0;
-			green = 255;
 		}
 		break;
 
@@ -117,43 +118,86 @@ void Game::HandleEvents()
 void GameLoop::Update()
 {
 	while (g.running)
-	{
+	{/*
+		startTime = SDL_GetTicks();
 		g.HandleEvents();
 
 		r.Render();
+		fps = SDL_GetTicks() - startTime;
+		fpsText = std::to_string(fps);
+		//SDL_Delay(floor(16.666f - fps));
+		*/
+		a = SDL_GetTicks();
+		delta = a - b;
+
+		if (delta > 1000 / 60.0)
+		{
+			std::cout << "fps: " << 1000 / delta << std::endl;
+
+			b = a;
+			fpsText = std::to_string(1000/delta);
+
+			g.HandleEvents();
+			r.Render();
+		}
+
+
 	}
 }
 
 void Renderer::Render()
 {
-
-
 	SDL_RenderClear(sdlRender);
-	t.textTexture = t.Init(r.sdlRender, "res/arial.ttf", 12, mapText, { red, green, blue }, textBox.x, textBox.y, &textBox);
-	t.display(textBox.x, textBox.y, r.sdlRender, t.textTexture, &textBox);
 	for (auto const& rect : rectangles)
 	{
-		if (rect != &textBox)
+		if (rect == selectedRect)
 		{
-			SDL_SetRenderDrawColor(r.sdlRender, 0, 255, 0, 255);
-			if (rect == selectedRect)
-			{
-				SDL_SetRenderDrawColor(r.sdlRender, 0, 0, 255, 255);
-			}
+			green = 0;
+			blue = 255;
+
+		}
+		
+		if (rect != selectedRect)
+		{
+			green = 255;
+			blue = 0;
+			
+		}
+		if(rect == &textBox)
+		{
+			alpha = 0;
+			
+		}
+		col = { red, green, blue, alpha };
+		SDL_SetRenderDrawColor(r.sdlRender, col.r, col.g, col.b, col.a);
+		if (rect == &textBox || rect == &fpsBox)
+		{
+			SDL_RenderDrawRect(r.sdlRender, rect);
+		}
+		else
+		{
 			SDL_RenderFillRect(r.sdlRender, rect);
 		}
 
 	}
+
+	
+	t.mapTexture = t.Init(r.sdlRender, "res/arial.ttf", 12, mapText, col, textBox.x, textBox.y, &textBox);
+	t.display(textBox.x, textBox.y, r.sdlRender, t.mapTexture, &textBox);
+	t.fpsTexture = t.Init(r.sdlRender, "res/arial.ttf", 40, fpsText, col, fpsBox.x, fpsBox.y, &fpsBox);
+	t.display(fpsBox.x, fpsBox.y, r.sdlRender, t.fpsTexture, &fpsBox);
+
 	SDL_SetRenderDrawColor(sdlRender, 0, 0, 0, 255);
-	SDL_DestroyTexture(t.textTexture);
+	SDL_DestroyTexture(t.mapTexture);
+	SDL_DestroyTexture(t.fpsTexture);
 	SDL_RenderPresent(sdlRender);
 
 }
 
 SDL_Texture* Text::Init(SDL_Renderer* renderer,const std::string &fontPath, int fontSize, std::string& textMessage, const SDL_Color &color, int x,int y, SDL_Rect* rect)
 {
-	textTexture = loadFont(renderer, fontPath, fontSize, textMessage, color, x, rect);
-	SDL_QueryTexture(textTexture, nullptr, nullptr, &textBox.w, &textBox.h);
+	SDL_Texture* textTexture = loadFont(renderer, fontPath, fontSize, textMessage, color, x, rect);
+	SDL_QueryTexture(textTexture, nullptr, nullptr, &rect->w, &rect->h);
 	//rect->w = 100;
 	//rect->h = 100;
 	//rect->x = x;
@@ -171,14 +215,14 @@ void Text::display(int x, int y, SDL_Renderer* renderer, SDL_Texture* textTextur
 
 SDL_Texture* Text::loadFont(SDL_Renderer* renderer, const std::string &fontPath, int fontSize, const std::string &textMessage, const SDL_Color &color, int x, SDL_Rect* rect)
 {
-	UINT32 width = SCREEN_WIDTH - x;
+	UINT32 width = 216;
 	TTF_Font* font;
 	SDL_Surface* textSurface;
 	font = TTF_OpenFont(fontPath.c_str(), fontSize);
 
 	textSurface = TTF_RenderText_Solid_Wrapped(font, textMessage.c_str(), color, width);
 
-	textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+	SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
 
 	SDL_FreeSurface(textSurface);
 	TTF_CloseFont(font);
@@ -202,7 +246,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpszCmdLine, int 
 			mapText.append(append);
 			mapText.append("  ");
 		}
-		mapText.append("\n");
+		//mapText.append("\n");
 	}
 
 
