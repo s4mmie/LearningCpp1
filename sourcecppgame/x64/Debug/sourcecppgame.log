@@ -1,2 +1,8 @@
+<<<<<<< HEAD
 ﻿  GameEngine.cpp
   sourcecppgame.vcxproj -> C:\Users\sam\Desktop\Github\sourcecppgame\x64\Debug\sourcecppgame.exe
+=======
+﻿  GameText.cpp
+  GameEngine.cpp
+LINK : fatal error LNK1104: cannot open file 'C:\Users\sam\Desktop\Github\paradise\sourcecppgame\include\x64\SDL2.lib'
+>>>>>>> ab9df21ed063834be490b5ab774fd1600ed6ffd5
