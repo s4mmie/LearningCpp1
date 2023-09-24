@@ -2,61 +2,75 @@
 #include "GameEngine.h"
 #include "GameTimer.h"
 
+struct Player
+{
+	float x = 14.5, y = 2.2 , z;
+	float pitch = 0.f, yaw = -0.9f, roll = 0.f; // .../img/PitchYawRoll Example.jpeg
+	const float fov = 3.14 / 4;
+};
 
 UINT8 red = 0, green = 255, blue = 0, alpha = 255;
-UINT32 startTime, frameTime;
+
+
 Renderer r;
 GameLoop loop;
 Game g;
 Text t;
-int mapHeight = 16;
-int mapWidth = 16;
-float fps;
-std::vector<std::vector<char>> map(mapHeight, std::vector<char>(mapWidth, '#'));
-std::string mapText = "";
-std::string fpsText = "0.0";
-SDL_Point mousePos;
-bool leftMouseButtonDown = false;
-SDL_Rect* selectedRect = NULL;
-SDL_Point clickOffset;
+Player p;
+
+std::wstring wMap;
+
+const int mapHeight = 16, mapWidth = 16;
+unsigned int frameStart = SDL_GetTicks(), frameTime = SDL_GetTicks();
+
+float fps, fpsCap = 128.f;
+
+bool leftMouseButtonDown = false, lagMode = false;
+
+double delta = 0;
+
+SDL_Color col = { 0, 0, 0, 255 };
+
 std::vector<SDL_Rect*> rectangles;
-SDL_Color col;
+std::vector<SDL_Point*> points;
+std::vector < std::vector<SDL_Color> >screenColor(SCREEN_WIDTH/PIXEL_SIZE, std::vector<SDL_Color>(SCREEN_HEIGHT/ PIXEL_SIZE, col));
+std::vector<std::vector<char>> map(mapHeight, std::vector<char>(mapWidth, '#'));
+std::string mapText = "", fpsText = "", lagText = "LAG TURNED ON: 30 FPS";
+
+SDL_Point clickOffset, mousePos;
 SDL_Rect rect1 = { 288, 208, 100, 100 };
 SDL_Rect rect2 = { 50, 50, 100, 80 };
-SDL_Rect textBox = { 0, 0, 0, 0 };
-SDL_Rect fpsBox = { 500, 100, 0, 0 };
-
-unsigned int a = SDL_GetTicks();
-unsigned int b = SDL_GetTicks();
-double delta = 0;
+SDL_Rect textBox = { 24, 123, 0, 0 };
+SDL_Rect fpsBox = { 100, 100, 0, 0 };
+SDL_Rect lagBox = { 0, 520, 0 ,0 };
+SDL_Rect* selectedRect = NULL;
 
 void Game::Start()
 {
 	running = true;
 	r.sdlWindow = SDL_CreateWindow("SDL test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
-	r.sdlRender = SDL_CreateRenderer(r.sdlWindow, -1, SDL_RENDERER_ACCELERATED);
+	r.sdlRender = SDL_CreateRenderer(r.sdlWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
 	SDL_Init(SDL_INIT_EVERYTHING);
 	TTF_Init();
 
-	rectangles.push_back(&textBox);
 	rectangles.push_back(&rect1);
 	rectangles.push_back(&rect2);
+	rectangles.push_back(&textBox);
 	rectangles.push_back(&fpsBox);
 	loop.Update();
 }
 
 void Game::Stop()
 {
-
-	
 	SDL_DestroyWindow(r.sdlWindow);
 	SDL_DestroyRenderer(r.sdlRender);
 	r.sdlWindow = nullptr;
 	r.sdlRender = nullptr;
 
-	SDL_Quit();
 	running = false;
+	SDL_Quit();
+
 }
 
 void Game::HandleEvents()
@@ -72,7 +86,17 @@ void Game::HandleEvents()
 
 	case SDL_KEYDOWN:
 		if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_ESCAPE) { running = false; break; }
+		if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_F) { fpsCap = 30.f; lagMode = true; break; }
+		if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_LEFT) { p.yaw -= 0.05f; break; }
+		if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_RIGHT) { p.yaw += 0.05f; break; }
 
+		if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_A) { p.x -= 0.2f; break; }
+		if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_D) { p.x += 0.2f; break; }
+
+		if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_W) { p.y -= 0.2f; break; }
+		if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_S) { p.y += 0.2f; break; }
+	case SDL_KEYUP:
+		if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_F) { fpsCap = 128.f; lagMode = false; break; }
 	case SDL_MOUSEBUTTONDOWN:
 		if (!leftMouseButtonDown && sdlEvent.button.button == SDL_BUTTON_LEFT)
 		{
@@ -118,27 +142,90 @@ void Game::HandleEvents()
 void GameLoop::Update()
 {
 	while (g.running)
-	{/*
-		startTime = SDL_GetTicks();
-		g.HandleEvents();
-
-		r.Render();
-		fps = SDL_GetTicks() - startTime;
-		fpsText = std::to_string(fps);
-		//SDL_Delay(floor(16.666f - fps));
-		*/
-		a = SDL_GetTicks();
-		delta = a - b;
-
-		if (delta > 1000 / 60.0)
+	{
+		if (p.x > mapWidth || p.x <= 0)
 		{
-			std::cout << "fps: " << 1000 / delta << std::endl;
+			p.x = 5;
+		}
+		if (p.y > mapHeight || p.y <= 0)
+		{
+			p.x = 5;
+		}
 
-			b = a;
-			fpsText = std::to_string(1000/delta);
+		for (int x = 0; x < (SCREEN_WIDTH / PIXEL_SIZE); x++)
+		{
+			float rayAngle = (p.yaw - p.fov / 2.0f) + ((float)x / float(SCREEN_WIDTH / PIXEL_SIZE) * p.fov);
+			float distanceToWall = 0;
+
+			bool isWallHit = false;
+
+			float eyeX = sinf(rayAngle);
+			float eyeY = cosf(rayAngle);
+
+			while (!isWallHit)
+			{
+				distanceToWall += 0.1f;
+				int wTestX = (int)(p.x + eyeX * distanceToWall);//Wall Test X & Wall Test Y
+				int wTestY = (int)(p.y + eyeY * distanceToWall);
+
+				if (wTestX < 0 || wTestX >= mapWidth || wTestY < 0 || wTestY >= mapHeight)
+				{
+					isWallHit = true;
+					distanceToWall = mapWidth;
+				}
+				else
+				{
+					if (wMap[wTestX * mapWidth + wTestY] == '#')
+					{
+						isWallHit = true;
+					}
+				}
+			}
+			int sCeiling = (float)((SCREEN_HEIGHT / PIXEL_SIZE) / 2.0) - (SCREEN_HEIGHT / PIXEL_SIZE) / ((float)distanceToWall); //Screen Ceiling & Screen Floor
+			int sFloor = (SCREEN_HEIGHT / PIXEL_SIZE) - sCeiling;
+			 
+			for (int y = 0; y < (SCREEN_HEIGHT / PIXEL_SIZE); y++)
+			{
+				if (y <= sCeiling)
+				{
+					red = 55; green = 55; blue = 55;
+					col = { red, green, blue, alpha };
+					screenColor[x][y] = col;
+				}
+				else if (y > sCeiling && y <= sFloor)
+				{
+					red = 255; green = 0; blue = 0;
+					col = { red, green, blue, alpha };
+					screenColor[x][y] = col;
+				}
+				else
+				{
+					red = 255; green = 182; blue = 193;
+					col = { red, green, blue, alpha };
+					screenColor[x][y] = col;
+				}
+				if (y == SCREEN_HEIGHT - 1)
+				{
+					int gotcha = 1;
+				}
+			}
+			
+		}
+		frameStart = SDL_GetTicks();
+		delta = frameStart - frameTime;
+		if (delta > 1000/fpsCap)
+		{
+			std::string fpsTextBase = "FPS: ";
+			
+			fps = (delta > 0) ? 1000.0f / delta: 0.0f;
+
+			std::string fpsTextFps = std::to_string(fps);
+
+			fpsText = fpsTextBase + fpsTextFps;
 
 			g.HandleEvents();
 			r.Render();
+			frameTime = frameStart;
 		}
 
 
@@ -147,51 +234,101 @@ void GameLoop::Update()
 
 void Renderer::Render()
 {
-	SDL_RenderClear(sdlRender);
-	for (auto const& rect : rectangles)
+
+	for(auto x = 0; x < (SCREEN_WIDTH / PIXEL_SIZE); x++)
 	{
-		if (rect == selectedRect)
+		for (auto y = 0; y < (SCREEN_HEIGHT / PIXEL_SIZE); y++)
 		{
-			green = 0;
-			blue = 255;
-
+			SDL_RenderSetScale(sdlRender,PIXEL_SIZE, PIXEL_SIZE);
+			SDL_SetRenderDrawColor(sdlRender, screenColor[x][y].r, screenColor[x][y].g, screenColor[x][y].b, 255);
+			SDL_RenderDrawPoint(sdlRender, x, y);
 		}
-		
-		if (rect != selectedRect)
-		{
-			green = 255;
-			blue = 0;
-			
-		}
-		if(rect == &textBox)
-		{
-			alpha = 0;
-			
-		}
-		col = { red, green, blue, alpha };
-		SDL_SetRenderDrawColor(r.sdlRender, col.r, col.g, col.b, col.a);
-		if (rect == &textBox || rect == &fpsBox)
-		{
-			SDL_RenderDrawRect(r.sdlRender, rect);
-		}
-		else
-		{
-			SDL_RenderFillRect(r.sdlRender, rect);
-		}
-
 	}
+	SDL_RenderSetScale(sdlRender, 1, 1);
+	for (auto const& rect : rectangles)
+		{
+			if (rect == selectedRect)
+			{
+				red = 0; green = 0; blue = 255;
+				if (selectedRect == &textBox)
+				{
+					red = 255; green = 0; blue = 255;
+				}
+				else if (selectedRect == &fpsBox)
+				{
+					red = 44; green = 101; blue = 121;
+				}
+			}
+		
+			if (rect != selectedRect)
+			{
+				red = 0; green = 255; blue = 0;
+			}
 
-	
-	t.mapTexture = t.Init(r.sdlRender, "res/arial.ttf", 12, mapText, col, textBox.x, textBox.y, &textBox);
+
+			if (rect == &textBox)
+			{
+				col = { red, green, blue, alpha };
+				SDL_SetRenderDrawColor(r.sdlRender, col.r, col.g, col.b, col.a);
+				SDL_RenderDrawRect(r.sdlRender, rect);
+			}
+			else if (rect == &fpsBox)
+			{
+				col = { red, green, blue, alpha };
+				SDL_SetRenderDrawColor(r.sdlRender, col.r, col.g, col.b, col.a);
+				SDL_RenderDrawRect(r.sdlRender, rect);
+			}
+			else
+			{
+				col = { red, green, blue, alpha };
+				SDL_SetRenderDrawColor(r.sdlRender, col.r, col.g, col.b, col.a);
+				SDL_RenderFillRect(r.sdlRender, rect);
+			}
+
+		}
+	if (selectedRect == &textBox)
+	{
+
+		red = 255; green = 0; blue = 255;
+		col = { red, green, blue, alpha };
+		t.mapTexture = t.Init(r.sdlRender, "res/arial.ttf", 12, mapText, col, textBox.x, textBox.y, &textBox);
+		red = 0; blue = 0; green = 255;
+		col = { red, green, blue, alpha };
+		t.fpsTexture = t.Init(r.sdlRender, "res/arial.ttf", 40, fpsText, col, fpsBox.x, fpsBox.y, &fpsBox);
+	}
+	else if(selectedRect == &fpsBox)
+	{
+		red = 0; blue = 0; green = 255;
+		col = { red, green, blue, alpha };
+		t.mapTexture = t.Init(r.sdlRender, "res/arial.ttf", 12, mapText, col, textBox.x, textBox.y, &textBox);
+		red = 44; green = 101; blue = 121;
+		col = { red, green, blue, alpha };
+		t.fpsTexture = t.Init(r.sdlRender, "res/arial.ttf", 40, fpsText, col, fpsBox.x, fpsBox.y, &fpsBox);
+	}
+	else
+	{
+		col = { red, green, blue, alpha };
+		t.mapTexture = t.Init(r.sdlRender, "res/arial.ttf", 12, mapText, col, textBox.x, textBox.y, &textBox);
+		t.fpsTexture = t.Init(r.sdlRender, "res/arial.ttf", 40, fpsText, col, fpsBox.x, fpsBox.y, &fpsBox);
+	}
+	if (lagMode == true)
+	{
+		red = 255; green = 0; blue = 0;
+		col = { red, green, blue, alpha };
+		t.lagTexture = t.Init(r.sdlRender, "res/arial.ttf", 45, lagText, col, lagBox.x, lagBox.y, &lagBox);
+		t.display(lagBox.x, lagBox.y, r.sdlRender, t.lagTexture, &lagBox);
+	}
 	t.display(textBox.x, textBox.y, r.sdlRender, t.mapTexture, &textBox);
-	t.fpsTexture = t.Init(r.sdlRender, "res/arial.ttf", 40, fpsText, col, fpsBox.x, fpsBox.y, &fpsBox);
 	t.display(fpsBox.x, fpsBox.y, r.sdlRender, t.fpsTexture, &fpsBox);
-
+	
 	SDL_SetRenderDrawColor(sdlRender, 0, 0, 0, 255);
-	SDL_DestroyTexture(t.mapTexture);
-	SDL_DestroyTexture(t.fpsTexture);
 	SDL_RenderPresent(sdlRender);
 
+
+	SDL_DestroyTexture(t.mapTexture);
+	SDL_DestroyTexture(t.fpsTexture);
+	SDL_DestroyTexture(t.lagTexture);
+	SDL_RenderClear(sdlRender);
 }
 
 SDL_Texture* Text::Init(SDL_Renderer* renderer,const std::string &fontPath, int fontSize, std::string& textMessage, const SDL_Color &color, int x,int y, SDL_Rect* rect)
@@ -229,10 +366,8 @@ SDL_Texture* Text::loadFont(SDL_Renderer* renderer, const std::string &fontPath,
 	return textTexture;
 }
 
-
 int WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpszCmdLine, int cmdShow)
 {
-
 	int xInt = -1;
 	std::string append;
 	for (auto x : map)
@@ -246,9 +381,27 @@ int WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpszCmdLine, int 
 			mapText.append(append);
 			mapText.append("  ");
 		}
-		//mapText.append("\n");
+		mapText.append("\n");
 	}
+	
+	wMap += L"################";
+	wMap += L"#..............#";
+	wMap += L"#..######......#";
+	wMap += L"#..............#";
+	wMap += L"#.......##.....#";
+	wMap += L"#.......##.....#";
+	wMap += L"#..............#";
+	wMap += L"#..............#";
+	wMap += L"#..............#";
+	wMap += L"#..............#";
+	wMap += L"#..............#";
+	wMap += L"#.......##.....#";
+	wMap += L"#..##..........#";
+	wMap += L"#..............#";
+	wMap += L"#..............#";
+	wMap += L"################";
 
+	
 
 
 	g.Start();

@@ -8,8 +8,9 @@
 #include <SDL_ttf.h>
 
 
-#define SCREEN_WIDTH 1280
-#define SCREEN_HEIGHT 720
+#define SCREEN_WIDTH 1920
+#define SCREEN_HEIGHT 1080
+#define PIXEL_SIZE 5
 
 class Renderer
 {
@@ -67,4 +68,5 @@ public:
    
     SDL_Texture* mapTexture = nullptr;
     SDL_Texture* fpsTexture = nullptr;
+    SDL_Texture* lagTexture = nullptr;
 };

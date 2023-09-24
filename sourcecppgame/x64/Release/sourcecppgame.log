@@ -1,4 +1,11 @@
-﻿  GameText.cpp
-  GameEngine.cpp
-C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets(1134,5): error MSB6006: "link.exe" exited with code 1181.
-LINK : fatal error LNK1181: cannot open input file 'C:\Users\sam\Desktop\Github\paradise\sourcecppgame\\include\x64\SDL2.lib'
+﻿  GameEngine.cpp
+C:\Users\terro\OneDrive\Documents\GitHub\source\paradise\sourcecppgame\sourcecppgame\GameEngine.cpp(7,22): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\terro\OneDrive\Documents\GitHub\source\paradise\sourcecppgame\sourcecppgame\GameEngine.cpp(9,25): warning C4305: 'initializing': truncation from 'double' to 'const float'
+C:\Users\terro\OneDrive\Documents\GitHub\source\paradise\sourcecppgame\sourcecppgame\GameEngine.cpp(168,17): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+C:\Users\terro\OneDrive\Documents\GitHub\source\paradise\sourcecppgame\sourcecppgame\GameEngine.cpp(200,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  Generating code
+  3 of 390 functions ( 0.8%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  sourcecppgame.vcxproj -> C:\Users\terro\OneDrive\Documents\GitHub\source\paradise\sourcecppgame\x64\Release\sourcecppgame.exe

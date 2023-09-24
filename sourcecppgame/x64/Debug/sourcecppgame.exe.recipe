@@ -2,11 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-<<<<<<< HEAD
-      <FullPath>C:\Users\sam\Desktop\Github\sourcecppgame\x64\Debug\sourcecppgame.exe</FullPath>
-=======
-      <FullPath>C:\Users\sam\Desktop\Github\paradise\x64\Debug\sourcecppgame.exe</FullPath>
->>>>>>> ab9df21ed063834be490b5ab774fd1600ed6ffd5
+      <FullPath>C:\Users\terro\OneDrive\Documents\GitHub\source\paradise\sourcecppgame\x64\Debug\sourcecppgame.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-﻿  GameEngine.cpp
-  sourcecppgame.vcxproj -> C:\Users\sam\Desktop\Github\sourcecppgame\x64\Debug\sourcecppgame.exe
-=======
-﻿  GameText.cpp
+﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(531,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (ParadiseEngine.vcxproj).  This can lead to incorrect clean and rebuild behavior.
   GameEngine.cpp
-LINK : fatal error LNK1104: cannot open file 'C:\Users\sam\Desktop\Github\paradise\sourcecppgame\include\x64\SDL2.lib'
->>>>>>> ab9df21ed063834be490b5ab774fd1600ed6ffd5
+C:\Users\terro\OneDrive\Documents\GitHub\source\paradise\sourcecppgame\sourcecppgame\GameEngine.cpp(184,17): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+C:\Users\terro\OneDrive\Documents\GitHub\source\paradise\sourcecppgame\sourcecppgame\GameEngine.cpp(220,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  sourcecppgame.vcxproj -> C:\Users\terro\OneDrive\Documents\GitHub\source\paradise\sourcecppgame\x64\Debug\sourcecppgame.exe
