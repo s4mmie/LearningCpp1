@@ -90,11 +90,23 @@ void Game::HandleEvents()
 		if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_LEFT) { p.yaw -= 0.05f; break; }
 		if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_RIGHT) { p.yaw += 0.05f; break; }
 
-		if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_A) { p.x -= 0.2f; break; }
-		if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_D) { p.x += 0.2f; break; }
+		//if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_A) { p.x -= sinf(p.yaw) * 0.2f; break; }
+		//if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_D) { p.x += sinf(p.yaw) * 0.2f; break; }
 
-		if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_W) { p.y -= 0.2f; break; }
-		if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_S) { p.y += 0.2f; break; }
+		if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_W) 
+		{
+			p.x += sinf(p.yaw) * 0.5f;
+			p.y += cosf(p.yaw) * 0.5f; 
+			break; 
+		}
+		if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_S) 
+		{
+			p.x -= sinf(p.yaw) * 0.5f;
+			p.y -= cosf(p.yaw) * 0.5f; 
+			break;
+		}
+		//Add key up dection for movement so i can hvae multiple keys being held down. have something that is called and will continue to run until key up happens
+		if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_R) { p.y = 7; p.x = 5; p.yaw = 0.f; break; }
 	case SDL_KEYUP:
 		if (sdlEvent.key.keysym.scancode == SDL_SCANCODE_F) { fpsCap = 128.f; lagMode = false; break; }
 	case SDL_MOUSEBUTTONDOWN:
@@ -143,14 +155,6 @@ void GameLoop::Update()
 {
 	while (g.running)
 	{
-		if (p.x > mapWidth || p.x <= 0)
-		{
-			p.x = 5;
-		}
-		if (p.y > mapHeight || p.y <= 0)
-		{
-			p.x = 5;
-		}
 
 		for (int x = 0; x < (SCREEN_WIDTH / PIXEL_SIZE); x++)
 		{
@@ -162,7 +166,7 @@ void GameLoop::Update()
 			float eyeX = sinf(rayAngle);
 			float eyeY = cosf(rayAngle);
 
-			while (!isWallHit)
+			while (!isWallHit && distanceToWall < mapWidth)
 			{
 				distanceToWall += 0.1f;
 				int wTestX = (int)(p.x + eyeX * distanceToWall);//Wall Test X & Wall Test Y
@@ -183,7 +187,34 @@ void GameLoop::Update()
 			}
 			int sCeiling = (float)((SCREEN_HEIGHT / PIXEL_SIZE) / 2.0) - (SCREEN_HEIGHT / PIXEL_SIZE) / ((float)distanceToWall); //Screen Ceiling & Screen Floor
 			int sFloor = (SCREEN_HEIGHT / PIXEL_SIZE) - sCeiling;
-			 
+			
+			int distanceR, distanceG, distanceB, distanceAmount;
+			if (distanceToWall <= mapWidth / 4) //close
+			{
+				distanceAmount = 200;
+				distanceR = distanceAmount; distanceG = distanceAmount; distanceB = distanceAmount;
+			}
+			else if (distanceToWall < mapWidth / 3) //semi close
+			{
+				distanceAmount = 150;
+				distanceR = distanceAmount; distanceG = distanceAmount; distanceB = distanceAmount;
+			}
+			else if (distanceToWall < mapWidth / 2) //semi far
+			{
+				distanceAmount = 100;
+				distanceR = distanceAmount; distanceG = distanceAmount; distanceB = distanceAmount;
+			}
+			else if (distanceToWall < mapWidth) //far
+			{
+				distanceAmount = 50;
+				distanceR = distanceAmount; distanceG = distanceAmount; distanceB = distanceAmount;
+			}
+			else // too far
+			{
+				distanceAmount = 0;
+				distanceR = distanceAmount; distanceG = distanceAmount; distanceB = distanceAmount;
+			}
+
 			for (int y = 0; y < (SCREEN_HEIGHT / PIXEL_SIZE); y++)
 			{
 				if (y <= sCeiling)
@@ -194,13 +225,13 @@ void GameLoop::Update()
 				}
 				else if (y > sCeiling && y <= sFloor)
 				{
-					red = 255; green = 0; blue = 0;
+					red = 55 + distanceR; green = 0; blue = 0;
 					col = { red, green, blue, alpha };
 					screenColor[x][y] = col;
 				}
 				else
 				{
-					red = 255; green = 182; blue = 193;
+					red = 255; green = 182; blue = 192;
 					col = { red, green, blue, alpha };
 					screenColor[x][y] = col;
 				}
