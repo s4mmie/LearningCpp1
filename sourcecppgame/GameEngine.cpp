@@ -27,14 +27,31 @@ float fps, fpsCap = 128.f;
 
 bool leftMouseButtonDown = false, lagMode = false;
 
-double delta = 0;
-
 SDL_Color col = { 0, 0, 0, 255 };
-
+SDL_Texture* screenBuffer;
 std::vector<SDL_Rect*> rectangles;
 std::vector<SDL_Point*> points;
-std::vector < std::vector<SDL_Color> >screenColor(SCREEN_WIDTH/PIXEL_SIZE, std::vector<SDL_Color>(SCREEN_HEIGHT/ PIXEL_SIZE, col));
-std::vector<std::vector<char>> map(mapHeight, std::vector<char>(mapWidth, '#'));
+
+SDL_Color screenColor[SCREEN_WIDTH][SCREEN_HEIGHT];
+//std::vector<std::vector<char>> map(mapHeight, std::vector<char>(mapWidth, '#'));
+const short map[mapHeight][mapWidth] = {
+{R,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R},
+{B,0,0,0,0,0,0,0,0,0,0,0,S,0,0,B},
+{B,0,0,0,0,0,0,0,0,0,0,0,0,0,0,B},
+{B,0,0,0,0,0,0,0,0,0,0,0,0,0,0,B},
+{B,0,0,0,0,0,0,0,0,0,0,0,0,0,0,B},
+{B,0,0,0,0,0,0,0,0,0,0,0,0,0,0,B},
+{B,0,0,0,0,0,0,0,0,0,0,0,0,0,0,B},
+{B,0,0,0,0,0,0,0,0,0,0,0,0,0,0,B},
+{B,0,0,0,0,0,0,0,0,0,0,0,0,0,0,B},
+{B,0,0,0,0,0,0,0,0,0,0,0,0,0,0,B},
+{B,0,0,0,0,0,0,0,0,0,0,0,0,0,0,B},
+{B,0,0,0,0,0,0,0,0,0,0,0,0,0,0,B},
+{B,0,0,0,0,0,0,0,0,0,0,0,0,0,0,B},
+{B,0,0,0,0,0,0,0,0,0,0,0,0,0,0,B},
+{B,0,0,0,0,0,0,0,0,0,0,0,0,0,0,B},
+{R,R,R,R,R,R,R,R,R,R,R,R,R,R,R,R}
+};
 std::string mapText = "", fpsText = "", lagText = "LAG TURNED ON: 30 FPS";
 
 SDL_Point clickOffset, mousePos;
@@ -50,6 +67,8 @@ void Game::Start()
 	running = true;
 	r.sdlWindow = SDL_CreateWindow("SDL test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 	r.sdlRender = SDL_CreateRenderer(r.sdlWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	screenBuffer = SDL_CreateTexture(r.sdlRender, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, SCREEN_WIDTH, SCREEN_HEIGHT);
+	SDL_SetRenderTarget(r.sdlRender, screenBuffer);
 
 	SDL_Init(SDL_INIT_EVERYTHING);
 	TTF_Init();
@@ -65,6 +84,7 @@ void Game::Stop()
 {
 	SDL_DestroyWindow(r.sdlWindow);
 	SDL_DestroyRenderer(r.sdlRender);
+	SDL_DestroyTexture(screenBuffer);
 	r.sdlWindow = nullptr;
 	r.sdlRender = nullptr;
 
@@ -155,10 +175,12 @@ void GameLoop::Update()
 {
 	while (g.running)
 	{
-
+		const float fovDiv2 = p.fov / 2.0f;
+		const float stepSize = p.fov / float(SCREEN_WIDTH / PIXEL_SIZE);
+		SDL_SetRenderTarget(r.sdlRender, screenBuffer);
 		for (int x = 0; x < (SCREEN_WIDTH / PIXEL_SIZE); x++)
 		{
-			float rayAngle = (p.yaw - p.fov / 2.0f) + ((float)x / float(SCREEN_WIDTH / PIXEL_SIZE) * p.fov);
+			float rayAngle = (p.yaw - fovDiv2) + (x * stepSize);
 			float distanceToWall = 0;
 
 			bool isWallHit = false;
@@ -220,30 +242,24 @@ void GameLoop::Update()
 				if (y <= sCeiling)
 				{
 					red = 55; green = 55; blue = 55;
-					col = { red, green, blue, alpha };
-					screenColor[x][y] = col;
 				}
 				else if (y > sCeiling && y <= sFloor)
 				{
 					red = 55 + distanceR; green = 0; blue = 0;
-					col = { red, green, blue, alpha };
-					screenColor[x][y] = col;
 				}
 				else
 				{
 					red = 255; green = 182; blue = 192;
-					col = { red, green, blue, alpha };
-					screenColor[x][y] = col;
 				}
-				if (y == SCREEN_HEIGHT - 1)
-				{
-					int gotcha = 1;
-				}
+
+				SDL_SetRenderDrawColor(r.sdlRender, red, green, blue, alpha);
+				SDL_RenderSetScale(r.sdlRender, 1, 1);
+				SDL_RenderDrawPoint(r.sdlRender, x, y);
 			}
 			
 		}
 		frameStart = SDL_GetTicks();
-		delta = frameStart - frameTime;
+		double delta = frameStart - frameTime;
 		if (delta > 1000/fpsCap)
 		{
 			std::string fpsTextBase = "FPS: ";
@@ -258,24 +274,15 @@ void GameLoop::Update()
 			r.Render();
 			frameTime = frameStart;
 		}
-
-
 	}
 }
 
 void Renderer::Render()
 {
+	SDL_SetRenderTarget(r.sdlRender, NULL);
 
-	for(auto x = 0; x < (SCREEN_WIDTH / PIXEL_SIZE); x++)
-	{
-		for (auto y = 0; y < (SCREEN_HEIGHT / PIXEL_SIZE); y++)
-		{
-			SDL_RenderSetScale(sdlRender,PIXEL_SIZE, PIXEL_SIZE);
-			SDL_SetRenderDrawColor(sdlRender, screenColor[x][y].r, screenColor[x][y].g, screenColor[x][y].b, 255);
-			SDL_RenderDrawPoint(sdlRender, x, y);
-		}
-	}
-	SDL_RenderSetScale(sdlRender, 1, 1);
+	// Copy the screen buffer texture to the window.
+	SDL_RenderCopy(r.sdlRender, screenBuffer, NULL, NULL);
 	for (auto const& rect : rectangles)
 		{
 			if (rect == selectedRect)
@@ -319,27 +326,27 @@ void Renderer::Render()
 		}
 	if (selectedRect == &textBox)
 	{
-
 		red = 255; green = 0; blue = 255;
 		col = { red, green, blue, alpha };
 		t.mapTexture = t.Init(r.sdlRender, "res/arial.ttf", 12, mapText, col, textBox.x, textBox.y, &textBox);
-		red = 0; blue = 0; green = 255;
-		col = { red, green, blue, alpha };
-		t.fpsTexture = t.Init(r.sdlRender, "res/arial.ttf", 40, fpsText, col, fpsBox.x, fpsBox.y, &fpsBox);
+		
 	}
-	else if(selectedRect == &fpsBox)
+	else
 	{
 		red = 0; blue = 0; green = 255;
 		col = { red, green, blue, alpha };
 		t.mapTexture = t.Init(r.sdlRender, "res/arial.ttf", 12, mapText, col, textBox.x, textBox.y, &textBox);
+	}
+	if(selectedRect == &fpsBox)
+	{
 		red = 44; green = 101; blue = 121;
 		col = { red, green, blue, alpha };
 		t.fpsTexture = t.Init(r.sdlRender, "res/arial.ttf", 40, fpsText, col, fpsBox.x, fpsBox.y, &fpsBox);
 	}
 	else
 	{
+		red = 0; blue = 0; green = 255;
 		col = { red, green, blue, alpha };
-		t.mapTexture = t.Init(r.sdlRender, "res/arial.ttf", 12, mapText, col, textBox.x, textBox.y, &textBox);
 		t.fpsTexture = t.Init(r.sdlRender, "res/arial.ttf", 40, fpsText, col, fpsBox.x, fpsBox.y, &fpsBox);
 	}
 	if (lagMode == true)
@@ -401,20 +408,20 @@ int WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpszCmdLine, int 
 {
 	int xInt = -1;
 	std::string append;
-	for (auto x : map)
+	for (auto x = 0; x < mapWidth; x++)
 	{
 		xInt++;
 		int yInt = -1;
-		for (auto y : x)
+		for (auto y = 0; y < mapHeight; y++)
 		{
 			yInt++;
 			append = map[xInt][yInt];
 			mapText.append(append);
-			mapText.append("  ");
+			mapText.append(" ");
 		}
 		mapText.append("\n");
 	}
-	
+	int i = 1;
 	wMap += L"################";
 	wMap += L"#..............#";
 	wMap += L"#..######......#";
@@ -439,76 +446,3 @@ int WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpszCmdLine, int 
 	return 1;
 }
 
-/*
-* struct RENDERSTATE
-{
-	int height, width, size;
-	void* memory;
-
-	BITMAPINFO bitmapInfo;
-};
-
-RENDERSTATE renderState;
-* 
-LRESULT CALLBACK windowCallback(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-
-	switch (uMsg)
-	{
-		case WM_CLOSE:
-			PostQuitMessage(69);
-			running = false; break;
-		case WM_DESTROY:
-			g.Stop(); break;
-
-		default: 
-			DefWindowProc(hwnd, uMsg, wParam, lParam); break;
-
-	}
-}
-
-const auto pClassName = L"source window";//pointer Class name
-	//Create window class
-	WNDCLASS wc = {};
-	wc.style = CS_OWNDC;
-	wc.lpszClassName = pClassName;
-	wc.lpfnWndProc = windowCallback;
-
-	//Register class
-	RegisterClass(&wc);
-
-	//Ceate window
-	HWND window = CreateWindow(wc.lpszClassName, L"My First Game", WS_OVERLAPPEDWINDOW | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, 1280, 720, 0, 0, hInstance, 0);
-	HDC hdc = GetDC(window);
-	int testX=0, testY=0;
-	
-	while (running)
-	{	
-		int testNum = 50;
-		testX+=2;
-		testY++;
-		if (testX >= (1228 - testNum))
-		{
-			testX = 0;
-		}
-		if (testY >= (668 - testNum))
-		{
-			testY = 0;
-		}
-
-		//Input
-		MSG message;
-		while (PeekMessage(&message, window, 0, 0, PM_REMOVE))
-		{
-			TranslateMessage(&message);
-			DispatchMessage(&message);
-		}
-		
-
-		//Simulate
-		clearScreen(0x0);
-		drawRect(testX, testY, testX+40, testY+40, 0x69420);
-
-		//Render
-		StretchDIBits(hdc, 0, 0, renderState.width, renderState.height, 0, 0, renderState.width, renderState.height, renderState.memory, &renderState.bitmapInfo, DIB_RGB_COLORS, SRCCOPY);
-	}*/

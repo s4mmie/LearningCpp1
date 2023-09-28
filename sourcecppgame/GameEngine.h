@@ -10,57 +10,50 @@
 
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
-#define PIXEL_SIZE 9
+#define PIXEL_SIZE 1
 
-class Renderer
+#define R 1 // red wall
+#define G 2 // green wall
+#define B 3 // blue wall
+#define W 4 // normal wall
+#define S -1 //player spawn
+
+struct Renderer
 {
-public:
-        SDL_Window* sdlWindow;
-        SDL_Renderer* sdlRender;
-        void Render();
+    SDL_Window* sdlWindow;
+    SDL_Renderer* sdlRender;
+    void Render();
 };
 
-class GameLoop
+struct GameLoop
 {
     //Game state
     public:
         void Update();
 };
 
-class Controls
+struct Controls
 {
     public:
         bool HandleInput(Renderer& render, GameLoop& simulate);
 };
 
-class Game
+struct Game
 {
     GameLoop loop;
     Renderer render;
     Controls con;
 
-public:
     bool running;
 
     void Start();
     void Stop();
     void HandleEvents();
-
-    inline void Run()
-    {
-        while (con.HandleInput(render, loop))
-        {
-            loop.Update();
-            render.Render();
-        }
-    }
 };
 
-class Text
+struct Text
 {
-public:
-
-    SDL_Texture* Init(SDL_Renderer *renderer, const std::string &fontPath, int fontSize, std::string &textMessage, const SDL_Color &color, int x, int y, SDL_Rect* rect);
+   SDL_Texture* Init(SDL_Renderer *renderer, const std::string &fontPath, int fontSize, std::string &textMessage, const SDL_Color &color, int x, int y, SDL_Rect* rect);
 
     void display(int x, int y, SDL_Renderer *renderer, SDL_Texture* textTexture, SDL_Rect* rect);
 

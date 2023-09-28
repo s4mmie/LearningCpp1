@@ -15,3 +15,11 @@
 *.tlog
 *.tlog
 sourcecppgame/x64/Debug/sourcecppgame.tlog/unsuccessfulbuild
+*.exe
+*.pdb
+*.pdb
+*.idb
+*.ilk
+*.log
+*.enc
+*.obj
